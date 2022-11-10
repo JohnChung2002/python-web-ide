@@ -1,7 +1,11 @@
 <?php function dockerise() {
     $id = shell_exec("docker run --network none --security-opt no-new-privileges --cap-drop ALL -dit python");
     $name = shell_exec("docker inspect --format '{{.Name}}' $id");
-    $name = substr($name, 2, strlen($name) - 4);
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        $name = substr($name, 2, strlen($name) - 4);
+    } else {
+        $name = substr($name, 1, strlen($name) - 2);
+    }
     $time_start = microtime(true);
     $output = shell_exec("docker exec -i $name timeout 4 python < pycode.py 2>&1");
     $time_end = microtime(true);
